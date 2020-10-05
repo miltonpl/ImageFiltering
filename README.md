@@ -10,8 +10,7 @@
 - UIViewControllers
 
 ## Sample
-![Demo1](https://media.giphy.com/media/NmdCow6QsrPda3K1J2/giphy.gif)
-
+![Demo1](https://media.giphy.com/media/wNF2LsRjezIjrPjc1c/giphy.gif)
 ---
 ## Images
 
