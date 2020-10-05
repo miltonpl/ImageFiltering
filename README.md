@@ -2,7 +2,7 @@
 # Image Filtering Collection
 ---
 ## Capabilities
-- Navigate forward and backward from screen one to screen two, and screen three
+- Navigate forward and backward My Photo Collection
 ## About
 - Data is passed back from ViewControllers using notifications
 ## Utility
