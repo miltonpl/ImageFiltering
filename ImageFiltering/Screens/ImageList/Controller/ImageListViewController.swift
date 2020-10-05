@@ -121,9 +121,11 @@ class ImageListViewController: UIViewController {
     
     func handleTextChange(_ text: String) {
         searchWebWorkItem?.cancel()
+        textEntered = text
         searchWebWorkItem = DispatchWorkItem {
-            self.storedDataResponse.removeAll()
-            self.fetchData(item: text)
+            
+//        self.storedDataResponse.removeAll()
+        self.fetchData(item: text)
         }
         guard let searchItem = searchWebWorkItem else {return }
         
@@ -179,14 +181,15 @@ extension ImageListViewController: UISearchBarDelegate {
                     break
                 }
             }
+        print("sea", searchBar.text)
+            if let text = searchBar.text, text.count >= 5, text != textEntered {
+                storedDataResponse.removeAll()
+                fetchData(item: text)
+            }
+        
             searchResultVC.imageData = self.imageDataAPI
             self.navigationController?.pushViewController(searchResultVC, animated: true)
 //            print("back\n\n\n",searchBar.text)
-            if let text = searchBar.text, text.count >= 5 {
-                storedDataResponse.removeAll()
-                fetchData(item: text)
-                
-            }
             
         }
     }
@@ -194,7 +197,6 @@ extension ImageListViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String){
         if searchText.count >= 5 {
             print("text: ", searchText)
-            textEntered = searchText
             handleTextChange(searchText)
         }
     } // called when text changes (including clear)
