@@ -12,24 +12,23 @@ class SourceCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet private weak var nameLabel: UILabel!
     @IBOutlet private weak var onoffSwitch: UISwitch!
-    var section:Section?
+    var section: Section?
+    var activeSections: Int?
     @IBAction func changedSwitch(_ sender: UISwitch){
         guard let section = self.section else {return }
+        if let active = activeSections, active <= 1 {
+            onoffSwitch.setOn(true, animated: true)
+        }
 
         if sender.isOn {
-            print( section.rawValue + ": is on")
             postNotification(section: SectionState(state: true, section: section ))
-
         }
         else {
-            print( section.rawValue + ": is off")
             postNotification(section: SectionState(state: false, section: section ))
-            
         }
         
     }
     func configure(section: Section){
-        
         self.nameLabel.text = section.rawValue
         self.section = section
     }
@@ -40,7 +39,22 @@ class SourceCollectionViewCell: UICollectionViewCell {
         
     }
 }
+extension SourceCollectionViewCell {
+    
+    func observerActiveSectionNotification() {
+           NotificationCenter.default.addObserver(self, selector: #selector(getNotification), name: .myNotificationCount, object: nil)
+       }
+    //update section removed/add
+   @objc func getNotification(_ notification: Notification) {
+       guard let count = notification.userInfo?["items"] as? Int else {return }
+        activeSections = count
+        print("activeSection:", activeSections!)
+   }
+}
 
 extension Notification.Name{
     static let myNotification = Notification.Name("AddRemove")
+    static let myNotificationAdd = Notification.Name("AddToList")
+    static let myNotificationCount = Notification.Name("CountSection")
+
 }

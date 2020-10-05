@@ -15,17 +15,16 @@ class ImageTableViewCell: UITableViewCell {
     @IBOutlet private weak var sourceLabel: UILabel!
     static let identifier = "ImageTableViewCell"
     var stringUrl:String?
-    func setProterties( item: ImageInfo, title: String){
+    func setProterties( item: PhotoDescription){
+        
         self.itemImageView.layer.cornerRadius = itemImageView.frame.height/5
         self.itemImageView.layer.borderWidth = 2
         self.itemImageView.layer.borderColor = UIColor.black.cgColor
-        self.itemImageView.layer.backgroundColor = UIColor.green.cgColor
-        self.sourceLabel.text = item.site
-        self.titleLabel.text = title
+        self.sourceLabel.text = item.source
+        self.titleLabel.text = item.title
+        self.stringUrl = item.site
         
-        guard let stringUrl = item.imageUrl, let url = URL(string: stringUrl) else { return }
-        self.stringUrl = stringUrl
-        self.itemImageView.downloadImage(with: url)
+        self.itemImageView.image = item.image
     }
     @IBAction func linkToWeb(_ sender: UIButton) {
         guard let url = URL(string: stringUrl ?? "") else {return}
