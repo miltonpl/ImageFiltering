@@ -3,11 +3,19 @@
 ---
 ## Capabilities
 - Navigate forward and backward My Photo Collection
+- Save Image to you you Photo Collection
 ## About
 - Data is passed back from ViewControllers using notifications
+- Images are parse using three APIs
+- Grand Central Dispatch (GCD) Iplementation used for fetching images, data from APIs
+-
 ## Utility
+
 - NotificationCenter
+
 - UIViewControllers
+- Singleton Class
+-
 
 ## Sample
 ![Demo1](https://media.giphy.com/media/wNF2LsRjezIjrPjc1c/giphy.gif)

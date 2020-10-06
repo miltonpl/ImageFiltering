@@ -14,20 +14,22 @@ class ImageTableViewCell: UITableViewCell {
     @IBOutlet private weak var titleLabel: UILabel!
     @IBOutlet private weak var sourceLabel: UILabel!
     static let identifier = "ImageTableViewCell"
-    var stringUrl:String?
-    func setProterties( item: PhotoDescription){
-        
-        self.itemImageView.layer.cornerRadius = itemImageView.frame.height/5
+    
+    private var stringUrl: String?
+    
+    func setProterties( urlStr: String?) {
+        self.itemImageView.layer.cornerRadius = itemImageView.frame.height / 5
         self.itemImageView.layer.borderWidth = 2
         self.itemImageView.layer.borderColor = UIColor.black.cgColor
-        self.sourceLabel.text = item.source
-        self.titleLabel.text = item.title
-        self.stringUrl = item.site
-        
-        self.itemImageView.image = item.image
+//        self.sourceLabel.text = item.source
+//        self.titleLabel.text = item.title
+//        self.stringUrl = item.site
+//        self.itemImageView.image = item.image
+        guard let urlStr = urlStr, let url = URL(string: urlStr) else { return }
+        itemImageView.downloadImage(with: url)
     }
-    @IBAction func linkToWeb(_ sender: UIButton) {
-        guard let url = URL(string: stringUrl ?? "") else {return}
+    @IBAction private func linkToWeb(_ sender: UIButton) {
+        guard let url = URL(string: stringUrl ?? "") else { return }
                UIApplication.shared.open(url)
     }
     
@@ -38,17 +40,16 @@ class ImageTableViewCell: UITableViewCell {
 
 extension UIImageView {
     
-    func downloadImage(with url: URL){
+    func downloadImage(with url: URL) {
         DispatchQueue.global().async {
             do {
                 //convert data to UIImage
-                let data  = try Data(contentsOf: url)
+                let data = try Data(contentsOf: url)
                 let image = UIImage(data: data)
                 DispatchQueue.main.async {
                     self.image = image
                 }
-            }
-            catch {
+            } catch {
                 print(error)
             }
         }

@@ -6,7 +6,6 @@
 //  Copyright © 2020 Milton. All rights reserved.
 //
 import UIKit
-import Foundation
 
 struct PhotoDescription {
     var image: UIImage?
@@ -16,3 +15,39 @@ struct PhotoDescription {
     var source: String?
 }
 
+//struct Sections {
+//    var title: String?
+//    var dataSource: [PhotoProtocol]?
+//}
+
+protocol PhotoProtocol {
+    var imageUrl: String? { get }
+    
+    init(dict: [String: Any])
+}
+
+struct SplashPhotoInfo: PhotoProtocol {
+    var imageUrl: String?
+    
+    init(dict: [String: Any]) {
+        self.imageUrl = dict["url"] as? String
+    }
+}
+
+struct PexelsPhotoInfo: PhotoProtocol {
+    var imageUrl: String?
+    
+    init(dict: [String: Any]) {
+        if let src = dict["src"] as? [String: Any] {
+            self.imageUrl = src["medium"] as? String
+        }
+    }
+}
+
+struct PixabayPhotoInfo: PhotoProtocol {
+    var imageUrl: String?
+    
+    init(dict: [String: Any]) {
+        self.imageUrl = dict["webformatURL"] as? String
+    }
+}

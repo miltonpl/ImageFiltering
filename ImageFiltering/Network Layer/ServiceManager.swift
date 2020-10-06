@@ -8,31 +8,41 @@
 
 import Foundation
 class ServiceManager {
-    var queueService = DispatchQueue.init(label: "mydata.queue.service", attributes: .concurrent)
-
-    static var manager = ServiceManager()
-    private init() {}
     
-    func request(url: NSMutableURLRequest, completionHandler: @escaping(Any?, Error?) -> Void) {
-        let myGroup = DispatchGroup()
-        myGroup.enter()
-        DispatchQueue.global().async {
-            let task = URLSession.shared.dataTask(with: url as URLRequest) { data, response, error  in
-                guard let httpResponse = response as? HTTPURLResponse,
-                    httpResponse.statusCode == 200, let data = data else {
-                        self.queueService.async(flags: .barrier) {
-                            completionHandler(nil, error)
-                        }
-                        myGroup.leave()
-                    return
-                }
-                self.queueService.async(flags: .barrier) {
-                    completionHandler(data, nil)
-                }
-                myGroup.leave()
-                
+    static var manager = ServiceManager()
+    
+    private init () {}
+    
+    func request(urlString: String, header: [String: String]?, parameters: [String: String]?, completionHandler: @escaping(Any?, Error?) -> Void) {
+        
+        guard var urlComponents = URLComponents(string: urlString) else { return }
+        if let parameters = parameters {
+            var elements: [URLQueryItem] = []
+            for(key, value) in parameters {
+                elements.append(URLQueryItem(name: key, value: value))
             }
-            task.resume()
+            urlComponents.queryItems = elements
         }
+        guard let url = urlComponents.url else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        if let header = header {
+            request.allHTTPHeaderFields = header
+        }
+        let task = URLSession.shared.dataTask(with: request) { data, response, error  in
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
+                completionHandler(nil, error)
+                return
+            }
+            do {
+                
+                let dataDictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                completionHandler(dataDictionary, nil)
+            } catch {
+                
+                completionHandler(nil, error)
+            }
+        }
+        task.resume()
     }
 }
