@@ -17,14 +17,15 @@ class ImageTableViewCell: UITableViewCell {
     
     private var stringUrl: String?
     
-    func setProterties( urlStr: String?) {
+    func setProterties( urlStr: String?, providerName: String) {
         self.itemImageView.layer.cornerRadius = itemImageView.frame.height / 5
         self.itemImageView.layer.borderWidth = 2
         self.itemImageView.layer.borderColor = UIColor.black.cgColor
-//        self.sourceLabel.text = item.source
+        self.sourceLabel.text = providerName
 //        self.titleLabel.text = item.title
 //        self.stringUrl = item.site
 //        self.itemImageView.image = item.image
+        prepareForReuse()
         guard let urlStr = urlStr, let url = URL(string: urlStr) else { return }
         itemImageView.downloadImage(with: url)
     }

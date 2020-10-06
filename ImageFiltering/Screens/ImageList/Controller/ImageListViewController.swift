@@ -34,35 +34,47 @@ class ImageListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.title = "My Photo Collection"
         tableView.register(ImageTableViewCell.nib(), forCellReuseIdentifier: ImageTableViewCell.identifier)
         searchBar.delegate = self
         setupProvider()
-        self.title = "My Photo Collection"
+        setupSettingButton()
+    }
+    func setupSettingButton () {
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingActionTabBar(_:)))
+    }
+    @objc func settingActionTabBar(_ sender: UIBarButtonItem ) {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard let settingViewController = storyboard.instantiateViewController(withIdentifier: "SettingViewController") as? SettingViewController else {
+            fatalError("Unagle to instantiateViewController") }
+        let navController = UINavigationController(rootViewController: settingViewController)
+        self.navigationController?.present(navController, animated: true, completion: nil)
+        
     }
     func loadSection(data: Any?, provider: Provider) {
         guard let dictionary = data as? [String: Any] else { return }
         var newList: [PhotoProtocol] = []
         switch provider.name {
         case Splash.name:
-             guard let listImages = dictionary["images"] as? [[String: Any]], !dictionary.isEmpty else { return }
+             guard let listImages = dictionary["images"] as? [[String: Any]], !listImages.isEmpty else { return }
              listImages .forEach { item in
-                 newList.append(SplashPhotoInfo(dict: item))
+                 newList.append(SplashPhotoInfo(dict: item, name: "Splash"))
              }
              self._dataResponse[.splash] = newList
              self._sectionList.append(.splash)
             
         case Pexels.name:
-             guard let listImages = dictionary["photos"] as? [[String: Any]], !dictionary.isEmpty else { return }
+             guard let listImages = dictionary["photos"] as? [[String: Any]], !listImages.isEmpty else { return }
              listImages .forEach { item in
-                     newList.append(PexelsPhotoInfo(dict: item))
+                     newList.append(PexelsPhotoInfo(dict: item, name: "Pexels"))
              }
              self._dataResponse[.pexels] = newList
              self._sectionList.append(.pexels)
 
         case PixaBay.name:
-             guard let listImages = dictionary["hits"] as? [[String: Any]], !dictionary.isEmpty else { return }
+             guard let listImages = dictionary["hits"] as? [[String: Any]], !listImages.isEmpty else { return }
              listImages .forEach { item in
-                 newList.append(PixabayPhotoInfo(dict: item))
+                 newList.append(PixabayPhotoInfo(dict: item, name: "PixaBay"))
              }
              self._dataResponse[.pixaBay] = newList
              self._sectionList.append(.pixaBay)
@@ -96,15 +108,14 @@ class ImageListViewController: UIViewController {
         }
         myGroupForJosonDecoder.notify(queue: DispatchQueue.main) {
             self.tableView.reloadData()
-            print("done")
-            if let data = self.dataResponse {
-                print(data.count)
-            }
         }
     }
     func handleTextChange(_ text: String) {
         searchWebWorkItem?.cancel()
-        
+        if !(dataResponse?.isEmpty ?? true) {
+            _dataResponse = [:]
+            _sectionList = []
+        }
         searchWebWorkItem = DispatchWorkItem {
         self.fetchData(text: text)
         }
@@ -134,10 +145,10 @@ extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ImageTableViewCell", for: indexPath)
             as? ImageTableViewCell else { fatalError("Unable to deque Tableview with ImageTableViewCell") }
-        guard let data = dataResponse, let list = data[sectionList[indexPath.section]], let urlStr = list[indexPath.row].imageUrl else {
+        guard let data = dataResponse, let list = data[sectionList[indexPath.section]], let urlStr = list[indexPath.row].imageUrl, let name = list[indexPath.row].name  else {
             fatalError("data not present")
         }
-        cell.setProterties(urlStr: urlStr)
+        cell.setProterties(urlStr: urlStr, providerName: name)
         return cell
     }
 }
