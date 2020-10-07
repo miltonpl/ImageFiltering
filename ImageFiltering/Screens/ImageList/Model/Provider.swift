@@ -12,4 +12,5 @@ struct Provider {
     var url: String
     var parameter: [String: String]
     var header: [String: String]?
+    var state: Bool
 }

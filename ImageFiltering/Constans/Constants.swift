@@ -25,8 +25,11 @@ enum Constants {
     ]
 }
 
-enum ApiRequestType: String {
-    
+struct ProviderInfo {
+    var name: ProviderType
+    var isOn: Bool = true
+}
+enum ProviderType: String {
     case splash = "Splash"
     case pexels = "Pexels"
     case pixaBay = "Pixa Bay"

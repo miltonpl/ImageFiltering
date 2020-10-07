@@ -7,20 +7,45 @@
 //
 
 import UIKit
+protocol ProviderTableViewCellDelegate: AnyObject {
+    func canChangeStatus() -> Bool
+    func didChangeStatus(provider: ProviderInfo)
+}
 
 class ProviderTableViewCell: UITableViewCell {
+    static let identifier = "ProviderTableViewCell"
+    
     @IBOutlet private weak var nameLabel: UILabel!
     @IBOutlet private weak var providerSwitch: UISwitch!
     
-    @IBAction private func stateSwitch(_ sender: UISwitch ) {
-        
-        if sender.isOn {
-            print("On")
-        } else {
-            print("OFF")
-        }
+    weak var delegate: ProviderTableViewCellDelegate?
+    var provider: ProviderInfo?
+    
+    static func nib() -> UINib {
+        return UINib(nibName: "ProviderTableViewCell", bundle: nil)
     }
-    func configure(_ provider: String ) {
-        nameLabel.text = provider
+    
+    func configure(_ provider: ProviderInfo) {
+        self.nameLabel.text = provider.name.rawValue
+        self.providerSwitch.isOn = provider.isOn
+        self.provider = provider
+    }
+    
+    @IBAction private func stateSwitch(_ sender: UISwitch ) {
+        guard var provider = self.provider else { return }
+        provider.isOn.toggle()
+        if !provider.isOn {
+            if delegate?.canChangeStatus() ?? false {
+                delegate?.didChangeStatus(provider: provider)
+                
+            } else {
+                sender.isOn = true
+                provider.isOn.toggle()
+            }
+            
+        } else {
+            delegate?.didChangeStatus(provider: provider)
+        }
+        self.provider?.isOn = provider.isOn
     }
 }

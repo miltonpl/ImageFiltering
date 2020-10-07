@@ -7,18 +7,10 @@
 //
 import UIKit
 
-struct PhotoDescription {
-    var image: UIImage?
-    var author: String?
-    var site: String?
-    var title: String?
-    var source: String?
+struct PhotoSection {
+    var title: ProviderType
+    var photos: [PhotoProtocol]?
 }
-
-//struct Sections {
-//    var title: String?
-//    var dataSource: [PhotoProtocol]?
-//}
 
 protocol PhotoProtocol {
     var name: String? { get }
