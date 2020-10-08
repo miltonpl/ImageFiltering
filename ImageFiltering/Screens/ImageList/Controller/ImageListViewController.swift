@@ -9,6 +9,7 @@
 import UIKit
 
 class ImageListViewController: UIViewController {
+    
     @IBOutlet private weak var tableView: UITableView! {
         didSet {
             self.tableView.tableFooterView = UIView()
@@ -19,10 +20,10 @@ class ImageListViewController: UIViewController {
     
     let myDispatchGroup = DispatchGroup()
     
-    private var providerList: [Provider] = []
+    private var providersList: [Provider] = []
     private var searchWebWorkItem: DispatchWorkItem?
     private var queue = DispatchQueue(label: "mydata.queue", attributes: .concurrent)
-    private var providers: [ProviderInfo] = []
+    private var providersInfo: [ProviderInfo] = []
     private var _photoSections: [PhotoSection] = []
     private var photoSections: [PhotoSection]? {
         queue.sync {
@@ -36,7 +37,6 @@ class ImageListViewController: UIViewController {
         searchBar.delegate = self
         setupProvider()
         setupSettingButton()
-//        observerAPIState()
     }
     func setupSettingButton () {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingActionTabBar(_:)))
@@ -46,11 +46,10 @@ class ImageListViewController: UIViewController {
         guard let settingViewController = storyboard.instantiateViewController(withIdentifier: "SettingViewController") as? SettingViewController else {
             fatalError("Unagle to instantiateViewController") }
         
-        settingViewController.configure(providers: providers)
-        
+        settingViewController.configure(providers: providersInfo)
+        settingViewController.delegate = self
         let navController = UINavigationController(rootViewController: settingViewController)
         self.navigationController?.present(navController, animated: true, completion: nil)
-        print("back from settingViewController: ", providerList)
     }
     func loadSection(data: Any?, provider: Provider) {
         guard let dictionary = data as? [String: Any] else { return }
@@ -61,29 +60,29 @@ class ImageListViewController: UIViewController {
             listImages .forEach { item in
                 newList.append(SplashPhotoInfo(dict: item, name: "Splash"))
             }
-            self._photoSections.append(PhotoSection(title: ProviderType.splash, photos: newList))
+            self._photoSections.append(PhotoSection(name: ProviderType.splash, photos: newList))
             
         case Pexels.name:
             guard let listImages = dictionary["photos"] as? [[String: Any]], !listImages.isEmpty else { return }
             listImages .forEach { item in
                 newList.append(PexelsPhotoInfo(dict: item, name: "Pexels"))
             }
-            self._photoSections.append(PhotoSection(title: ProviderType.pexels, photos: newList))
+            self._photoSections.append(PhotoSection(name: ProviderType.pexels, photos: newList))
             
         case PixaBay.name:
             guard let listImages = dictionary["hits"] as? [[String: Any]], !listImages.isEmpty else { return }
             listImages .forEach { item in
                 newList.append(PixabayPhotoInfo(dict: item, name: "PixaBay"))
             }
-            self._photoSections.append(PhotoSection(title: ProviderType.pixaBay, photos: newList))
+            self._photoSections.append(PhotoSection(name: ProviderType.pixaBay, photos: newList))
         default:
             print("not a provider!!!")
         }
     }
     // MARK: - GetDataFromServer Method
     func fetchData(text: String) {
-        for provider in providerList {
-            guard provider.state else { continue }
+        for provider in providersList {
+            guard provider.isOn else { continue }
             var parameter = provider.parameter
             if provider.parameter["q"] != nil {
                 parameter["q"] = text
@@ -103,10 +102,13 @@ class ImageListViewController: UIViewController {
                 }
             }
         }
+        
         myDispatchGroup.notify(queue: DispatchQueue.main) {
+        
             self.tableView.reloadData()
             if let photoSections = self.photoSections {
-                print("photoSection.count: ", photoSections.count)
+                print("photoSection.count: In for loop ", photoSections.count)
+                photoSections.forEach { print("sections: ", $0.name) }
             }
         }
     }
@@ -116,26 +118,36 @@ class ImageListViewController: UIViewController {
             _photoSections = []
         }
         searchWebWorkItem = DispatchWorkItem {
+            print(self.providersInfo)
+            for (index, provider) in self.providersInfo.enumerated() where provider.isOn == true {
+                self.providersList[index].isOn = true
+            }
+            
             self.fetchData(text: text)
+            
+            for index in 0 ..< self.providersList.count {
+                self.providersList[index].isOn = false
+            }
+            
         }
         guard let searchItem = searchWebWorkItem else { return }
         DispatchQueue.global().asyncAfter(deadline: .now() + 3, execute: searchItem)
     }
     func setupProvider() {
-        providerList.append(Provider(name: Splash.name, url: Splash.url, parameter: Splash.parameters, state: true))
-        providerList.append(Provider(name: PixaBay.name, url: PixaBay.url, parameter: PixaBay.parameters, state: true))
-        providerList.append(Provider(name: Pexels.name, url: Pexels.url, parameter:
-            Pexels.parameters, header: Pexels.headers, state: true))
-        providers.append(ProviderInfo(name: .splash, isOn: true))
-        providers.append(ProviderInfo(name: .pixaBay, isOn: true))
-        providers.append(ProviderInfo(name: .pexels, isOn: true))
+        providersList.append(Provider(name: Splash.name, url: Splash.url, parameter: Splash.parameters, isOn: true))
+        providersList.append(Provider(name: PixaBay.name, url: PixaBay.url, parameter: PixaBay.parameters, isOn: true))
+        providersList.append(Provider(name: Pexels.name, url: Pexels.url, parameter:
+            Pexels.parameters, header: Pexels.headers, isOn: true))
+        providersInfo.append(ProviderInfo(name: .splash, isOn: true))
+        providersInfo.append(ProviderInfo(name: .pixaBay, isOn: true))
+        providersInfo.append(ProviderInfo(name: .pexels, isOn: true))
     }
 }
 
 extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return photoSections?[section].title.rawValue ?? ""
+        return photoSections?[section].name.rawValue ?? ""
     }
     func numberOfSections(in tableView: UITableView) -> Int {
         photoSections?.count ?? 0
@@ -143,6 +155,23 @@ extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return photoSections?[section].photos?.count ?? 0
     }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.tableView.deselectRow(at: indexPath, animated: true)
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        //Check collectionView cell
+        /*
+        guard let filterViewController = storyboard.instantiateViewController(withIdentifier: "ApplyFilterViewController") as? ApplyFilterViewController, let sectionsArray = photoSections,
+            let photos = sectionsArray[indexPath.section].photos, let urlStr = photos[indexPath.row].imageUrl else {
+            fatalError("Unable to instantiate vie controllerr with identity: AppyFilterViewContolle") }
+        */
+        guard let filterViewController = storyboard.instantiateViewController(withIdentifier: "FilterPhotoViewController") as? FilterPhotoViewController, let sectionsArray = photoSections,
+                   let photos = sectionsArray[indexPath.section].photos, let urlStr = photos[indexPath.row].imageUrl else {
+                   fatalError("Unable to instantiate vie controllerr with identity: FilterPhotoViewController") }
+        filterViewController.configure(imageStringUrl: urlStr)
+        self.navigationController?.pushViewController(filterViewController, animated: true)
+        
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ImageTableViewCell", for: indexPath)
             as? ImageTableViewCell else { fatalError("Unable to deque Tableview with ImageTableViewCell") }
@@ -167,59 +196,40 @@ extension ImageListViewController: UISearchBarDelegate {
 }
 extension ImageListViewController {
     
-    // MARK: - Notification addObserver
-//    func observerAPIState() {
-//        // Register to receive notification in your class
-//        NotificationCenter.default.addObserver(self, selector: #selector(getNotification(_:)), name: .myNotification, object: nil)
-//    }
-//    @objc func getNotification(_ notification: Notification) {
-        /*
-         
-        guard let provider = notification.userInfo?["api"] as? APIState else { return }
-        
-        let indexOfProviderState = providerState.firstIndex(where: { $0.name == provider.name})
-        let indexList = providerList.firstIndex(where: { $0.name == provider.name.rawValue})
-        guard let indexProvider = indexList, let index = indexOfProviderState  else { return }
-        providerState[index] = provider
-        var providerWillChanged = providerList[indexProvider]
-        
-        if provider.state {
-            providerWillChanged.state = true
-            
-            addProvider(provider: provider)
-        } else {
-            providerWillChanged.state = false
-            
-            removeProvider(provider: provider)
-        }
-        providerList[indexProvider] = providerWillChanged
-        var activeProviders = 0
-        providerState.forEach { provider in
-            if provider.state {
-                activeProviders += 1
-            }
-        }
-        postNotificationToSettingTableViewCell(activeProviders: activeProviders )
-        **/
-    }
-    //Some work
-    /*
-    func removeProvider(provider: APIState) {
-        print("romoveProvider: ", provider.name)
-        print("keys:", _dataResponse.keys)
-        guard dataResponse?.count ?? 0 > 1 else { return }
-        self._dataResponse.removeValue(forKey: provider.name)
-        self._sectionList.removeAll { $0 == provider.name}
+    func removeProvider(provider: ProviderInfo) {
+//        print("Provider to remove: ", provider.name)
+        self._photoSections.removeAll { $0.name == provider.name }
         tableView.reloadData()
-        print("afterRemoal: ", _dataResponse.keys)
+//        photoSections?.forEach({ print("providers After Removed: ", $0.name.rawValue) })
     }
-    func addProvider(provider: APIState) {
+    func addProvider() {
         guard  let text = searchBar.text, text.count >= 5 else { return }
         fetchData(text: text)
     }
-    func postNotificationToSettingTableViewCell(activeProviders: Int) {
-        let data: [String: Int] = ["switch": activeProviders]
-        NotificationCenter.default.post(name: .myNotification2, object: nil, userInfo: data)
+}
+
+extension ImageListViewController: SettingViewControllerDelegate {
+    
+    func updateProvider(provider: ProviderInfo) {
+        
+        let indexProvider = updateProviders(provider: provider)
+        if provider.isOn {
+            if let index = indexProvider {
+                addProvider()
+                providersList[index].isOn = false
+            }
+
+        } else {
+            removeProvider(provider: provider)
+        }
     }
-    **/
-//}
+    
+    func updateProviders(provider: ProviderInfo) -> Int? {
+       for (index, currentProvider) in providersInfo.enumerated() where currentProvider.name == provider.name {
+           self.providersInfo[index].isOn = provider.isOn
+           self.providersList[index].isOn = provider.isOn
+           return index
+       }
+        return nil
+    }
+}

@@ -8,9 +8,9 @@
 
 import Foundation
 struct Provider {
-    var name: String
+    var name: ProviderType
     var url: String
     var parameter: [String: String]
     var header: [String: String]?
-    var state: Bool
+    var isOn: Bool
 }

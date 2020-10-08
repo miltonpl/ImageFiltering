@@ -8,7 +8,7 @@
 import UIKit
 
 struct PhotoSection {
-    var title: ProviderType
+    var name: ProviderType
     var photos: [PhotoProtocol]?
 }
 

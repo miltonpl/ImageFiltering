@@ -10,6 +10,7 @@ import UIKit
 protocol ProviderTableViewCellDelegate: AnyObject {
     func canChangeStatus() -> Bool
     func didChangeStatus(provider: ProviderInfo)
+    func notifyUser()
 }
 
 class ProviderTableViewCell: UITableViewCell {
@@ -41,6 +42,7 @@ class ProviderTableViewCell: UITableViewCell {
             } else {
                 sender.isOn = true
                 provider.isOn.toggle()
+                delegate?.notifyUser()
             }
             
         } else {

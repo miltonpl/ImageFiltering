@@ -10,32 +10,18 @@ import UIKit
 
 class ImageTableViewCell: UITableViewCell {
     
-    @IBOutlet private weak var itemImageView: UIImageView!
-    @IBOutlet private weak var titleLabel: UILabel!
-    @IBOutlet private weak var sourceLabel: UILabel!
     static let identifier = "ImageTableViewCell"
-    
-    private var stringUrl: String?
+    @IBOutlet private weak var itemImageView: UIImageView!
+        
+    static func nib() -> UINib {
+           return UINib(nibName: "ImageTableViewCell", bundle: nil)
+       }
     
     func setProterties( urlStr: String?, providerName: String) {
-        self.itemImageView.layer.cornerRadius = itemImageView.frame.height / 5
-        self.itemImageView.layer.borderWidth = 2
+        self.itemImageView.layer.borderWidth = 3
         self.itemImageView.layer.borderColor = UIColor.black.cgColor
-        self.sourceLabel.text = providerName
-//        self.titleLabel.text = item.title
-//        self.stringUrl = item.site
-//        self.itemImageView.image = item.image
-        prepareForReuse()
         guard let urlStr = urlStr, let url = URL(string: urlStr) else { return }
         itemImageView.downloadImage(with: url)
-    }
-    @IBAction private func linkToWeb(_ sender: UIButton) {
-        guard let url = URL(string: stringUrl ?? "") else { return }
-               UIApplication.shared.open(url)
-    }
-    
-    static func nib() -> UINib {
-        return UINib(nibName: "ImageTableViewCell", bundle: nil)
     }
 }
 
