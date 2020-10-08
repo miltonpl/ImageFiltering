@@ -73,13 +73,13 @@ extension ApplyFilterViewController: UITableViewDelegate, UITableViewDataSource 
 }
 extension ApplyFilterViewController: FilterTableViewCellDelegate {
   func setFilter(filter: FilterType) {
-    let image = self.originalImage?.addFilter(filter: filter)
+    let image = self.originalImage?.applyFilter(filter: filter)
     self.itemImageView.image = image
   }
   
 }
 extension UIImage {
-    func addFilter(filter: FilterType ) -> UIImage? {
+    func applyFilter(filter: FilterType ) -> UIImage? {
         let filter = CIFilter(name: filter.rawValue)
         //convert UIImage to CIImage and set as input
         let ciInput = CIImage(image: self)

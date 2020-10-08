@@ -22,6 +22,7 @@
 		524CB07F252EE86100EFD4F5 /* FilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CB07D252EE86100EFD4F5 /* FilterCollectionViewCell.swift */; };
 		524CB080252EE86100EFD4F5 /* FilterCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 524CB07E252EE86100EFD4F5 /* FilterCollectionViewCell.xib */; };
 		524CB082252EECB500EFD4F5 /* FilterPhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CB081252EECB500EFD4F5 /* FilterPhotoViewController.swift */; };
+		524CB085252F73FC00EFD4F5 /* FilterImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CB084252F73FC00EFD4F5 /* FilterImage.swift */; };
 		527A1FE725292770002BADEE /* UIViewControllerExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A1FE625292770002BADEE /* UIViewControllerExtention.swift */; };
 		527A1FEA252983AD002BADEE /* ServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A1FE9252983AD002BADEE /* ServiceManager.swift */; };
 		52DE52B5252B7DE3008AA8C4 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 52DE52B4252B7DE3008AA8C4 /* README.md */; };
@@ -52,6 +53,7 @@
 		524CB07D252EE86100EFD4F5 /* FilterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCollectionViewCell.swift; sourceTree = "<group>"; };
 		524CB07E252EE86100EFD4F5 /* FilterCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FilterCollectionViewCell.xib; sourceTree = "<group>"; };
 		524CB081252EECB500EFD4F5 /* FilterPhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPhotoViewController.swift; sourceTree = "<group>"; };
+		524CB084252F73FC00EFD4F5 /* FilterImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterImage.swift; sourceTree = "<group>"; };
 		527A1FE625292770002BADEE /* UIViewControllerExtention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerExtention.swift; sourceTree = "<group>"; };
 		527A1FE9252983AD002BADEE /* ServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceManager.swift; sourceTree = "<group>"; };
 		52DE52B4252B7DE3008AA8C4 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -98,10 +100,10 @@
 		522B72882527859100F7CC69 /* ImageFiltering */ = {
 			isa = PBXGroup;
 			children = (
+				524CB087252F8E1800EFD4F5 /* Screens */,
 				527A1FF2252AEB41002BADEE /* Constans */,
 				527A1FE825298380002BADEE /* Network Layer */,
 				527A1FE52529273D002BADEE /* Extensions */,
-				522B72A12527869F00F7CC69 /* Screens */,
 				522B72A02527864C00F7CC69 /* Storyboard */,
 				522B729F252785E100F7CC69 /* Support Files */,
 				522B72922527859500F7CC69 /* Assets.xcassets */,
@@ -145,7 +147,7 @@
 			path = Storyboard;
 			sourceTree = "<group>";
 		};
-		522B72A12527869F00F7CC69 /* Screens */ = {
+		522B72A12527869F00F7CC69 /* ScreensGCD */ = {
 			isa = PBXGroup;
 			children = (
 				524CB07A252EE7E900EFD4F5 /* ApplyFilter2 */,
@@ -153,7 +155,7 @@
 				52DE534C252D042E008AA8C4 /* SettingScreen */,
 				522B72AE2528178900F7CC69 /* ImageList */,
 			);
-			path = Screens;
+			path = ScreensGCD;
 			sourceTree = "<group>";
 		};
 		522B72A2252786C700F7CC69 /* Model */ = {
@@ -194,6 +196,7 @@
 		524CB07A252EE7E900EFD4F5 /* ApplyFilter2 */ = {
 			isa = PBXGroup;
 			children = (
+				524CB083252F73D400EFD4F5 /* Model */,
 				524CB07C252EE82400EFD4F5 /* View */,
 				524CB07B252EE81400EFD4F5 /* Controller */,
 			);
@@ -215,6 +218,30 @@
 				524CB07E252EE86100EFD4F5 /* FilterCollectionViewCell.xib */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		524CB083252F73D400EFD4F5 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				524CB084252F73FC00EFD4F5 /* FilterImage.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		524CB086252F8DB900EFD4F5 /* ScreensOpations */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ScreensOpations;
+			sourceTree = "<group>";
+		};
+		524CB087252F8E1800EFD4F5 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				524CB086252F8DB900EFD4F5 /* ScreensOpations */,
+				522B72A12527869F00F7CC69 /* ScreensGCD */,
+			);
+			path = Screens;
 			sourceTree = "<group>";
 		};
 		527A1FE52529273D002BADEE /* Extensions */ = {
@@ -454,6 +481,7 @@
 				52DE5353252D07FE008AA8C4 /* ProviderTableViewCell.swift in Sources */,
 				522B728A2527859100F7CC69 /* AppDelegate.swift in Sources */,
 				522B728C2527859100F7CC69 /* SceneDelegate.swift in Sources */,
+				524CB085252F73FC00EFD4F5 /* FilterImage.swift in Sources */,
 				527A1FEA252983AD002BADEE /* ServiceManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
