@@ -14,6 +14,7 @@ protocol ProviderTableViewCellDelegate: AnyObject {
 }
 
 class ProviderTableViewCell: UITableViewCell {
+    
     static let identifier = "ProviderTableViewCell"
     
     @IBOutlet private weak var nameLabel: UILabel!

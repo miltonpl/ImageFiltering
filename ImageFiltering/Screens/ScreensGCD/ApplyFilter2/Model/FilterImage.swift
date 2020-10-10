@@ -11,3 +11,14 @@ struct FilterImage {
     var image: UIImage
     var filter: FilterType
 }
+enum FilterType: String {
+    case chrome = "CIPhotoEffectChrome"
+    case fade = "CIPhotoEffectFade"
+    case instant = "CIPhotoEffectInstant"
+    case mono = "CIPhotoEffectMono"
+    case noir = "CIPhotoEffectNoir"
+    case process = "CIPhotoEffectProcess"
+    case tonal = "CIPhotoEffectTonal"
+    case transfer =  "CIPhotoEffectTransfer"
+    case none = "None"
+}

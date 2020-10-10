@@ -10,9 +10,12 @@ import UIKit
 protocol SettingViewControllerDelegate: AnyObject {
     
     func updateProvider(provider: ProviderInfo)
+    func applyFilterToImages(filter: FilterType)
 }
+
 class SettingViewController: UIViewController {
     
+    @IBOutlet weak var selectFilterButton: UIButton!
     @IBOutlet private weak var tableView: UITableView! {
         didSet {
             self.tableView.tableFooterView = UIView()
@@ -20,7 +23,6 @@ class SettingViewController: UIViewController {
             self.tableView.register(ProviderTableViewCell.nib(), forCellReuseIdentifier: ProviderTableViewCell.identifier )
         }
     }
-    
     private var providers: [ProviderInfo] = [] {
         didSet {
             self.tableView?.reloadData()
@@ -28,15 +30,16 @@ class SettingViewController: UIViewController {
     }
     weak var delegate: SettingViewControllerDelegate?
     override func viewDidLoad() {
-        self.title = "Settings"
         super.viewDidLoad()
+        self.title = "Settings"
+        self.selectFilterButton.setTitle( "Set Filter To All Images                                             >", for: .normal)
         self.setupLeftTabItem()
     }
     
     func setupLeftTabItem() {
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneInSettings(_:)))
     }
-
+    
     func configure(providers: [ProviderInfo] ) {
         self.providers = providers
     }
@@ -44,8 +47,21 @@ class SettingViewController: UIViewController {
     @objc func doneInSettings(_ sender: UIBarButtonItem) {
         self.dismiss(animated: true, completion: nil)
     }
+    
+    @IBAction func selectedButton(_ sender: UIButton ) {
+        print("pressed")
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard  let applyFilterViewController = storyboard.instantiateViewController(withIdentifier: "SelectFilterViewController") as? SelectFilterViewController else {
+            fatalError("Anable to instantiateViewController in Setting View Controller")
+            
+        }
+        applyFilterViewController.delegate = self
+        self.navigationController?.pushViewController(applyFilterViewController, animated: true)
+        
+    }
+    
 }
-
 extension SettingViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -53,7 +69,7 @@ extension SettingViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-       
+        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ProviderTableViewCell", for: indexPath) as? ProviderTableViewCell else {
             fatalError("unable to dequeue tableView withIdentifier: ProviderTableViewCell") }
         cell.configure(providers[indexPath.row])
@@ -62,8 +78,13 @@ extension SettingViewController: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-extension SettingViewController: ProviderTableViewCellDelegate {
+extension SettingViewController: ProviderTableViewCellDelegate, SelectFilterViewControllerDelegate {
     
+    func applyFilterToImagesInImageListViewController(filter: FilterType) {
+        
+        delegate?.applyFilterToImages(filter: filter)
+    }
+
     func notifyUser() {
         let alertController = UIAlertController(title: "Providers", message: "At least one provider should be active", preferredStyle: .actionSheet)
         alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
@@ -74,7 +95,7 @@ extension SettingViewController: ProviderTableViewCellDelegate {
     func canChangeStatus() -> Bool {
         return providers.filter { $0.isOn }.count > 1
     }
-
+    
     func didChangeStatus(provider: ProviderInfo) {
         if let indexProvider = self.providers.firstIndex(where: { $0.name == provider.name }) {
             self.providers[indexProvider] = provider

@@ -23,6 +23,7 @@ class ImageListViewController: UIViewController {
     private var providersList: [Provider] = []
     private var searchWebWorkItem: DispatchWorkItem?
     private var queue = DispatchQueue(label: "mydata.queue", attributes: .concurrent)
+    private var applyFilter: FilterType?
     private var providersInfo: [ProviderInfo] = []
     private var _photoSections: [PhotoSection] = []
     private var photoSections: [PhotoSection]? {
@@ -37,7 +38,12 @@ class ImageListViewController: UIViewController {
         searchBar.delegate = self
         setupProvider()
         setupSettingButton()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 200
+        self.tableView.separatorColor = .black
+
     }
+
     func setupSettingButton () {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingActionTabBar(_:)))
     }
@@ -152,24 +158,21 @@ extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
         photoSections?.count ?? 0
     }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return photoSections?[section].photos?.count ?? 0
     }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.tableView.deselectRow(at: indexPath, animated: true)
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        //Check collectionView cell
-        /*
-        guard let filterViewController = storyboard.instantiateViewController(withIdentifier: "ApplyFilterViewController") as? ApplyFilterViewController, let sectionsArray = photoSections,
-            let photos = sectionsArray[indexPath.section].photos, let urlStr = photos[indexPath.row].imageUrl else {
-            fatalError("Unable to instantiate vie controllerr with identity: AppyFilterViewContolle") }
-        */
+        
         guard let filterViewController = storyboard.instantiateViewController(withIdentifier: "FilterPhotoViewController") as? FilterPhotoViewController, let sectionsArray = photoSections,
                    let photos = sectionsArray[indexPath.section].photos, let urlStr = photos[indexPath.row].imageUrl else {
                    fatalError("Unable to instantiate vie controllerr with identity: FilterPhotoViewController") }
         filterViewController.configure(imageStringUrl: urlStr)
-        self.navigationController?.pushViewController(filterViewController, animated: true)
-        
+        let navController = UINavigationController(rootViewController: filterViewController)
+        self.navigationController?.present(navController, animated: true, completion: nil)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -179,7 +182,7 @@ extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
         guard let sectionsArray = photoSections, let photos = sectionsArray[indexPath.section].photos, let urlStr = photos[indexPath.row].imageUrl, let name = photos[indexPath.row].name  else {
             fatalError("data not present")
         }
-        cell.setProterties(urlStr: urlStr, providerName: name)
+        cell.setProterties(urlStr: urlStr, providerName: name, applyFilter)
         return cell
     }
 }
@@ -197,10 +200,8 @@ extension ImageListViewController: UISearchBarDelegate {
 extension ImageListViewController {
     
     func removeProvider(provider: ProviderInfo) {
-//        print("Provider to remove: ", provider.name)
         self._photoSections.removeAll { $0.name == provider.name }
         tableView.reloadData()
-//        photoSections?.forEach({ print("providers After Removed: ", $0.name.rawValue) })
     }
     func addProvider() {
         guard  let text = searchBar.text, text.count >= 5 else { return }
@@ -209,6 +210,18 @@ extension ImageListViewController {
 }
 
 extension ImageListViewController: SettingViewControllerDelegate {
+    
+    func applyFilterToImages(filter: FilterType) {
+       
+        if filter == .none {
+            tableView.reloadData()
+            applyFilter = nil
+            
+        } else {
+            applyFilter = filter
+            tableView.reloadData()
+        }
+    }
     
     func updateProvider(provider: ProviderInfo) {
         

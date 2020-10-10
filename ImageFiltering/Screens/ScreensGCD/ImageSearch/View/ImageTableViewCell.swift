@@ -17,11 +17,32 @@ class ImageTableViewCell: UITableViewCell {
            return UINib(nibName: "ImageTableViewCell", bundle: nil)
        }
     
-    func setProterties( urlStr: String?, providerName: String) {
+    func setProterties( urlStr: String?, providerName: String, _ filter: FilterType? ) {
         self.itemImageView.layer.borderWidth = 3
         self.itemImageView.layer.borderColor = UIColor.black.cgColor
-        guard let urlStr = urlStr, let url = URL(string: urlStr) else { return }
-        itemImageView.downloadImage(with: url)
+//        self.imageView?.contentMode = .scaleAspectFit
+        print("FiterType in Image Cell::", filter ?? "none")
+         guard let urlStr = urlStr, let url = URL(string: urlStr) else { return }
+        if let filter = filter {
+            
+            DispatchQueue.global().async {
+                ServiceManager.manager.applyFilter(imageUrl: urlStr, filter: filter) { image in
+                    guard let image = image else { print("Ops no Image"); return }
+                    DispatchQueue.main.async {
+                        self.itemImageView.image = image
+                        print("image success")
+                        print("FiterType in Image Cell:: \(filter)" )
+
+                    }
+                }
+            }
+            
+        } else {
+           
+            itemImageView.downloadImage(with: url)
+            
+        }
+       
     }
 }
 
