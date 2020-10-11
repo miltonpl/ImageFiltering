@@ -14,13 +14,18 @@ class FilterPhotoViewController: UIViewController {
             self.collectionView.register(FilterCollectionViewCell.nib(), forCellWithReuseIdentifier: FilterCollectionViewCell.identifier)
         }
     }
-    @IBOutlet weak var itemImageView: UIImageView!
+    @IBOutlet weak var itemImageView: UIImageView! {
+        didSet {
+            self.itemImageView.contentMode = .scaleAspectFill
+        }
+    }
     private var originalImage: UIImage?
     private var queue = DispatchQueue(label: "my.queue.fiter", attributes: .concurrent)
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     private var filterList: [FilterType] = []
     private var imageUrl: String?
-    
+    private var providerName: String?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.itemImageView.layer.borderWidth = 3
@@ -40,17 +45,23 @@ class FilterPhotoViewController: UIViewController {
       }
     
     @objc func saveBarItem(_ sender: UIBarButtonItem) {
-        self.dismiss(animated: true, completion: nil)
-
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard let myCollectionViewController = storyboard.instantiateViewController(withIdentifier: "MyCollectionViewController") as?
+            MyCollectionViewController else { fatalError("Unable to idenfity MyCollectionViewController") }
+        if let image = self.itemImageView.image, let name = providerName {
+            myCollectionViewController.configure(photoInfo: PhotoInfo(image: image, title: name))
+            self.navigationController?.pushViewController(myCollectionViewController, animated: true)
+        }
     }
 
     @objc func cancelBarItem(_ sender: UIBarButtonItem) {
         self.dismiss(animated: true, completion: nil)
        }
     
-    func configure(imageStringUrl: String) {
-        print(imageStringUrl)
+    func configure(imageStringUrl: String, name: String) {
         self.imageUrl = imageStringUrl
+        self.providerName = name
         guard let url = URL(string: imageStringUrl) else { return }
         self.downloadImage(with: url)
     }

@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -49,6 +50,56 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1103" y="92"/>
+        </scene>
+        <!--My Collection View Controller-->
+        <scene sceneID="UzY-fC-SDY">
+            <objects>
+                <viewController storyboardIdentifier="MyCollectionViewController" id="POO-RW-jd8" customClass="MyCollectionViewController" customModule="ImageFiltering" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="xg8-K6-fMv">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="ftR-Y9-4CZ">
+                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="rnM-xz-74D">
+                                    <size key="itemSize" width="128" height="128"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MyCollectionViewCell" id="8TJ-gd-J37" customClass="MyCollectionViewCell" customModule="ImageFiltering" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="TOk-qc-Tz5">
+                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </collectionViewCellContentView>
+                                    </collectionViewCell>
+                                </cells>
+                                <connections>
+                                    <outlet property="dataSource" destination="POO-RW-jd8" id="Bmp-Nr-RUp"/>
+                                    <outlet property="delegate" destination="POO-RW-jd8" id="dwC-aF-xmk"/>
+                                </connections>
+                            </collectionView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="hev-xP-wDC" firstAttribute="bottom" secondItem="ftR-Y9-4CZ" secondAttribute="bottom" id="CWR-tL-DCc"/>
+                            <constraint firstItem="ftR-Y9-4CZ" firstAttribute="leading" secondItem="hev-xP-wDC" secondAttribute="leading" id="YMn-Q4-80Z"/>
+                            <constraint firstItem="hev-xP-wDC" firstAttribute="trailing" secondItem="ftR-Y9-4CZ" secondAttribute="trailing" id="e8y-sn-g9E"/>
+                            <constraint firstItem="ftR-Y9-4CZ" firstAttribute="top" secondItem="hev-xP-wDC" secondAttribute="top" id="qg2-ki-vN7"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="hev-xP-wDC"/>
+                    </view>
+                    <connections>
+                        <outlet property="collectionView" destination="ftR-Y9-4CZ" id="Fey-0D-B8S"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="sHi-Pq-hxG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1448" y="947"/>
         </scene>
         <!--Setting View Controller-->
         <scene sceneID="GxQ-9H-vj1">
@@ -263,10 +314,10 @@
             </objects>
             <point key="canvasLocation" x="-1009" y="-875"/>
         </scene>
-        <!--Search Photos View Controller-->
+        <!--Photo List View Controller-->
         <scene sceneID="wpV-Zh-b0C">
             <objects>
-                <viewController storyboardIdentifier="SearchPhotosViewController" id="58M-gq-CNI" customClass="SearchPhotosViewController" customModule="ImageFiltering" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PhotoListViewController" id="58M-gq-CNI" customClass="PhotoListViewController" customModule="ImageFiltering" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="YfJ-Yq-vtC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

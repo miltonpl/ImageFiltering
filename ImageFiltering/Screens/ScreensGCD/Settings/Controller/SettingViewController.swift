@@ -9,7 +9,7 @@
 import UIKit
 protocol SettingViewControllerDelegate: AnyObject {
     
-    func updateProvider(provider: ProviderInfo)
+    func updateProvidersList(provider: ProviderInfo)
     func applyFilterToImages(filter: FilterType)
 }
 
@@ -49,7 +49,6 @@ class SettingViewController: UIViewController {
     }
     
     @IBAction func selectedButton(_ sender: UIButton ) {
-        print("pressed")
         
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         guard  let applyFilterViewController = storyboard.instantiateViewController(withIdentifier: "SelectFilterViewController") as? SelectFilterViewController else {
@@ -86,7 +85,7 @@ extension SettingViewController: ProviderTableViewCellDelegate, SelectFilterView
     }
 
     func notifyUser() {
-        let alertController = UIAlertController(title: "Providers", message: "At least one provider should be active", preferredStyle: .actionSheet)
+        let alertController = UIAlertController(title: "Active Providers", message: "At least one provider should be active, thanks", preferredStyle: .actionSheet)
         alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
         self.present(alertController, animated: true)
         
@@ -99,7 +98,7 @@ extension SettingViewController: ProviderTableViewCellDelegate, SelectFilterView
     func didChangeStatus(provider: ProviderInfo) {
         if let indexProvider = self.providers.firstIndex(where: { $0.name == provider.name }) {
             self.providers[indexProvider] = provider
-            delegate?.updateProvider(provider: provider)
+            delegate?.updateProvidersList(provider: provider)
         }
     }
 }

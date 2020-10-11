@@ -23,26 +23,27 @@ class FilterCollectionViewCell: UICollectionViewCell {
         activityIndicator.startAnimating()
         self.itemImageView.layer.borderWidth = 2
         self.itemImageView.layer.borderColor = UIColor.black.cgColor
+        self.itemImageView.contentMode = .scaleAspectFill
         self.titleLabel.textColor = .darkGray
         self.titleLabel.text = "\(filter)"
+        
         if filter != .none {
             DispatchQueue.global().async {
                 ServiceManager.manager.applyFilter(imageUrl: imageUrl, filter: filter) { image in
-                    guard let image = image else { print("Ops no Image"); return }
+                    guard let image = image else { print("Unaible to download Photo in Collection View Cell"); return }
                     DispatchQueue.main.async {
                         self.itemImageView.image = image
                         self.activityIndicator.stopAnimating()
                         self.activityIndicator.isHidden = true
                         
-                        print("image success")
                     }
                 }
             }
-            print("In Collection Cell")
         } else {
             guard let url = URL(string: imageUrl) else { return }
-            
             itemImageView.downloadImage(with: url)
+            self.activityIndicator.stopAnimating()
+            self.activityIndicator.isHidden = true
         }
     }
 }

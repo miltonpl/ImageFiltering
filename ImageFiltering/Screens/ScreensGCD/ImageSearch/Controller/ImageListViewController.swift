@@ -34,20 +34,21 @@ class ImageListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "My Photo Collection"
+        self.title = "Photo Search"
         searchBar.delegate = self
         setupProvider()
         setupSettingButton()
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 200
         self.tableView.separatorColor = .black
-
     }
-
+    
     func setupSettingButton () {
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingActionTabBar(_:)))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingAction(_:)))
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "My Collection", style: .plain, target: self, action: #selector(myColletionAction(_:)))
+        
     }
-    @objc func settingActionTabBar(_ sender: UIBarButtonItem ) {
+    @objc func settingAction(_ sender: UIBarButtonItem ) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         guard let settingViewController = storyboard.instantiateViewController(withIdentifier: "SettingViewController") as? SettingViewController else {
             fatalError("Unagle to instantiateViewController") }
@@ -57,6 +58,14 @@ class ImageListViewController: UIViewController {
         let navController = UINavigationController(rootViewController: settingViewController)
         self.navigationController?.present(navController, animated: true, completion: nil)
     }
+    @objc func myColletionAction(_ sender: UIBarButtonItem ) {
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard let myCollectionViewController = storyboard.instantiateViewController(withIdentifier: "MyCollectionViewController") as?
+            MyCollectionViewController else { fatalError("Unable to idenfity MyCollectionViewController") }
+        self.navigationController?.pushViewController(myCollectionViewController, animated: true)
+    }
+    
     func loadSection(data: Any?, provider: Provider) {
         guard let dictionary = data as? [String: Any] else { return }
         var newList: [PhotoProtocol] = []
@@ -64,21 +73,21 @@ class ImageListViewController: UIViewController {
         case Splash.name:
             guard let listImages = dictionary["images"] as? [[String: Any]], !listImages.isEmpty else { return }
             listImages .forEach { item in
-                newList.append(SplashPhotoInfo(dict: item, name: "Splash"))
+                newList.append(SplashPhotoInfo(dict: item, name: Splash.name))
             }
             self._photoSections.append(PhotoSection(name: ProviderType.splash, photos: newList))
             
         case Pexels.name:
             guard let listImages = dictionary["photos"] as? [[String: Any]], !listImages.isEmpty else { return }
             listImages .forEach { item in
-                newList.append(PexelsPhotoInfo(dict: item, name: "Pexels"))
+                newList.append(PexelsPhotoInfo(dict: item, name: Pexels.name))
             }
             self._photoSections.append(PhotoSection(name: ProviderType.pexels, photos: newList))
             
         case PixaBay.name:
             guard let listImages = dictionary["hits"] as? [[String: Any]], !listImages.isEmpty else { return }
             listImages .forEach { item in
-                newList.append(PixabayPhotoInfo(dict: item, name: "PixaBay"))
+                newList.append(PixabayPhotoInfo(dict: item, name: PixaBay.name))
             }
             self._photoSections.append(PhotoSection(name: ProviderType.pixaBay, photos: newList))
         default:
@@ -87,21 +96,21 @@ class ImageListViewController: UIViewController {
     }
     // MARK: - GetDataFromServer Method
     func fetchData(text: String) {
-        for provider in providersList {
-            guard provider.isOn else { continue }
+        for provider in providersList where provider.isOn {
             var parameter = provider.parameter
             if provider.parameter["q"] != nil {
                 parameter["q"] = text
             } else {
                 parameter["query"] = text
             }
-            myDispatchGroup.enter()
             DispatchQueue.main.async {
-                self.queue.async(flags: .barrier) {
-                    ServiceManager.manager.request(urlString: provider.url, header: provider.header, parameters: parameter) { [provider] data, error in
-                        if let error = error {
-                            print(error)
-                        }
+                
+                self.myDispatchGroup.enter()
+                ServiceManager.manager.request(urlString: provider.url, header: provider.header, parameters: parameter) { [provider] data, error in
+                    
+                    if let error = error { print(error) }
+                    
+                    self.queue.async(flags: .barrier) {
                         self.loadSection(data: data, provider: provider)
                         self.myDispatchGroup.leave()
                     }
@@ -110,7 +119,7 @@ class ImageListViewController: UIViewController {
         }
         
         myDispatchGroup.notify(queue: DispatchQueue.main) {
-        
+            
             self.tableView.reloadData()
             if let photoSections = self.photoSections {
                 print("photoSection.count: In for loop ", photoSections.count)
@@ -124,7 +133,7 @@ class ImageListViewController: UIViewController {
             _photoSections = []
         }
         searchWebWorkItem = DispatchWorkItem {
-            print(self.providersInfo)
+            print("DispatchWorkItem ", self.providersInfo)
             for (index, provider) in self.providersInfo.enumerated() where provider.isOn == true {
                 self.providersList[index].isOn = true
             }
@@ -167,10 +176,11 @@ extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
         self.tableView.deselectRow(at: indexPath, animated: true)
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         
-        guard let filterViewController = storyboard.instantiateViewController(withIdentifier: "FilterPhotoViewController") as? FilterPhotoViewController, let sectionsArray = photoSections,
-                   let photos = sectionsArray[indexPath.section].photos, let urlStr = photos[indexPath.row].imageUrl else {
-                   fatalError("Unable to instantiate vie controllerr with identity: FilterPhotoViewController") }
-        filterViewController.configure(imageStringUrl: urlStr)
+        guard let filterViewController = storyboard.instantiateViewController(withIdentifier: "FilterPhotoViewController") as? FilterPhotoViewController,
+            let photosDetails = photoSections?[indexPath.section].photos?[indexPath.row] else {
+                fatalError("Unable to instantiate vie controllerr with identity: FilterPhotoViewController") }
+        
+        filterViewController.configure(imageStringUrl: photosDetails.imageUrl ?? "", name: photosDetails.name.rawValue)
         let navController = UINavigationController(rootViewController: filterViewController)
         self.navigationController?.present(navController, animated: true, completion: nil)
     }
@@ -179,10 +189,9 @@ extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ImageTableViewCell", for: indexPath)
             as? ImageTableViewCell else { fatalError("Unable to deque Tableview with ImageTableViewCell") }
         
-        guard let sectionsArray = photoSections, let photos = sectionsArray[indexPath.section].photos, let urlStr = photos[indexPath.row].imageUrl, let name = photos[indexPath.row].name  else {
-            fatalError("data not present")
-        }
-        cell.setProterties(urlStr: urlStr, providerName: name, applyFilter)
+        guard let photoDetails = photoSections?[indexPath.section].photos?[indexPath.row] else { fatalError("data not present") }
+        
+        cell.setProterties(urlStr: photoDetails.imageUrl, providerName: photoDetails.name.rawValue, applyFilter)
         return cell
     }
 }
@@ -212,7 +221,7 @@ extension ImageListViewController {
 extension ImageListViewController: SettingViewControllerDelegate {
     
     func applyFilterToImages(filter: FilterType) {
-       
+        
         if filter == .none {
             tableView.reloadData()
             applyFilter = nil
@@ -223,7 +232,7 @@ extension ImageListViewController: SettingViewControllerDelegate {
         }
     }
     
-    func updateProvider(provider: ProviderInfo) {
+    func updateProvidersList(provider: ProviderInfo) {
         
         let indexProvider = updateProviders(provider: provider)
         if provider.isOn {
@@ -231,18 +240,18 @@ extension ImageListViewController: SettingViewControllerDelegate {
                 addProvider()
                 providersList[index].isOn = false
             }
-
+            
         } else {
             removeProvider(provider: provider)
         }
     }
     
     func updateProviders(provider: ProviderInfo) -> Int? {
-       for (index, currentProvider) in providersInfo.enumerated() where currentProvider.name == provider.name {
-           self.providersInfo[index].isOn = provider.isOn
-           self.providersList[index].isOn = provider.isOn
-           return index
-       }
+        for (index, currentProvider) in providersInfo.enumerated() where currentProvider.name == provider.name {
+            self.providersInfo[index].isOn = provider.isOn
+            self.providersList[index].isOn = provider.isOn
+            return index
+        }
         return nil
     }
 }

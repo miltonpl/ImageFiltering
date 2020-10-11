@@ -18,11 +18,9 @@ class SelectFilterViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView! {
         didSet {
             self.tableView.tableFooterView = UIView()
-//            self.tableView.allowsSelection = false
-            self.tableView.separatorColor = .green
-           
         }
     }
+       
     weak var delegate: SelectFilterViewControllerDelegate?
     var filterTypes: [FilterType] = []
     var indexPath: IndexPath?
