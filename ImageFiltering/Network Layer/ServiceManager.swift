@@ -9,15 +9,12 @@ import UIKit
 import Foundation
 class ServiceManager {
     let imageCache = NSCache<NSString, CIImage >()
-    
     static var manager = ServiceManager()
     
     private init () {}
-    
-    func request(urlString: String, header: [String: String]?, parameters: [String: String]?, completionHandler: @escaping(Any?, Error?) -> Void) {
-        
-        guard var urlComponents = URLComponents(string: urlString) else { return }
-        if let parameters = parameters {
+    func request(provider: Provider, completionHandler: @escaping(Any?, Error?) -> Void) {
+        guard var urlComponents = URLComponents(string: provider.url) else { return }
+        if let parameters = provider.parameter {
             var elements: [URLQueryItem] = []
             for(key, value) in parameters {
                 elements.append(URLQueryItem(name: key, value: value))
@@ -27,19 +24,17 @@ class ServiceManager {
         guard let url = urlComponents.url else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        if let header = header {
+        if let header = provider.header {
             request.allHTTPHeaderFields = header
         }
         let task = URLSession.shared.dataTask(with: request) { data, response, error  in
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let data = data else {
                 completionHandler(nil, error); return
             }
-            
             do {
                 let dataDictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
                 completionHandler(dataDictionary, nil)
             } catch {
-                
                 completionHandler(nil, error)
             }
         }
@@ -71,14 +66,13 @@ class ServiceManager {
             filter?.setValue(ciInputImage, forKey: "inputImage")
             //Get output CIImage, render as CGImage First to retail proper UIImage scale
             let ciOutput = filter?.outputImage
-            let ciContext = CIContext()
+            let ciContext = Constants.ciContext
             
             if let ciOutputImage = ciOutput, let ciOutputExtent = ciOutput?.extent {
                 let cgImage = ciContext.createCGImage(ciOutputImage, from: ciOutputExtent)
                 if let cgImageSuccesful = cgImage {
                     // convet to UIImage and return image
                     completionHandler(UIImage(cgImage: cgImageSuccesful))
-                    
                 } else {
                     print("not successful to create CIImage ")
                     completionHandler(nil)
@@ -88,7 +82,6 @@ class ServiceManager {
                 print("ERROR unwrapping CIImage and applying CIOutput?.extent")
                 completionHandler(nil)
             }
-            
         }
     }
     
