@@ -27,13 +27,12 @@ class PhotoListViewController: UIViewController {
         let label = UILabel()
         label.text = "Search any images and \nsaved in your fivotire collection"
         label.font = .boldSystemFont(ofSize: 20.0)
-        label.textColor = .systemBackground
+        label.textColor = .darkGray
         return label
         
     }()
     private var reloadDataQueue = DispatchQueue(label: "reload.data.queue")
     private let pendingOperations = PendingOperation()
-    private var helper = Helper()
     private var timer: Timer?
     private var filterType: FilterType?
     private var providersList: [Provider] = []
@@ -55,8 +54,8 @@ class PhotoListViewController: UIViewController {
         super.viewDidLoad()
         self.title = "Screen Using Operations"
         self.setupSettingButton()
-        self.providersList = helper.providersList
-        self.providersInfo = helper.providersInfo
+        self.providersList = Constants.providers
+        self.providersInfo = Constants.providerInfo
         self.showNoResults()
         self.tableView.backgroundView = self.label
     }
@@ -66,7 +65,11 @@ class PhotoListViewController: UIViewController {
     }
     func didFinishloading() {
         showNoResults()
+        photoSections?.forEach({ (section) in
+            print(section.name)
+        })
         tableView.reloadData()
+        print("load")
     }
     
     func numberOfSetions() -> Int {
@@ -237,6 +240,7 @@ extension PhotoListViewController {
         guard self.pendingOperations.filtrationsInProgress[indexPath] == nil else { return }
         
         let filterOperation = ImageFiltration(photoRecord)
+        
         filterOperation.completionBlock = {
             if filterOperation.isCancelled { return }
             OperationQueue.main.addOperation {
@@ -270,7 +274,7 @@ extension PhotoListViewController: SettingViewControllerDelegate {
     func applyFilterToImages(filter: FilterType) {
         filterType = (filter != .none) ? filter : nil
     }
-    func updateProvidersList(provider: ProviderInfo) {
+    func setupAddReveProvider(provider: ProviderInfo) {
         let indexProvider = updateProvidersInfo(provider: provider)
         if provider.isOn {
             if let index = indexProvider {

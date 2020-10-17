@@ -9,7 +9,7 @@
 import UIKit
 
 class ImageListViewController: UIViewController {
-    
+    // MARK: - IBOutlet Store Properties
     @IBOutlet private weak var tableView: UITableView! {
         didSet {
             self.tableView.tableFooterView = UIView()
@@ -25,6 +25,8 @@ class ImageListViewController: UIViewController {
             self.searchBar.showsCancelButton = true
         }
     }
+    
+    // MARK: - Lazy var Implementation
     lazy var label: UILabel = {
            let label = UILabel()
            label.text = "Search any images and \nsaved to your favotire collection"
@@ -32,8 +34,13 @@ class ImageListViewController: UIViewController {
            label.textAlignment = .center
            label.numberOfLines = 0
            return label
-           
        }()
+    lazy var storyBoard: UIStoryboard = {
+          var storyboard = UIStoryboard(name: "Main", bundle: nil)
+          return storyboard
+      }()
+    
+    // MARK: - Store Properies Implementation
     private let myDispatchGroup = DispatchGroup()
     
     private var providersList: [Provider] = []
@@ -48,27 +55,27 @@ class ImageListViewController: UIViewController {
         }
     }
     
+    // MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Using GCD"
-        self.setupSettingButton()
+        self.setupSettingAction()
         self.providersInfo = Constants.providerInfo
         self.providersList = Constants.providers
         self.showNoResults()
-//        self.tableView.backgroundView = self.label
         self.showNoResults()
-         
     }
     
-    func setupSettingButton () {
+    // MARK: - Setup Bar buttons
+    func setupSettingAction () {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingAction(_:)))
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Favorites", style: .plain, target: self, action: #selector(myColletionAction(_:)))
         
     }
     
+    // MARK: - Instantiate My CollectionView Controller
     @objc func settingAction(_ sender: UIBarButtonItem ) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        guard let settingViewController = storyboard.instantiateViewController(withIdentifier: "SettingViewController") as? SettingViewController else {
+        guard let settingViewController = storyBoard.instantiateViewController(withIdentifier: "SettingViewController") as? SettingViewController else {
             fatalError("Unagle to instantiateViewController") }
         
         settingViewController.configure(providers: providersInfo)
@@ -77,13 +84,14 @@ class ImageListViewController: UIViewController {
         self.navigationController?.present(navController, animated: true, completion: nil)
     }
     
+    // MARK: - Instantiate My CollectionView Controller
     @objc func myColletionAction(_ sender: UIBarButtonItem ) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        guard let myCollectionViewController = storyboard.instantiateViewController(withIdentifier: "MyCollectionViewController") as?
+        guard let myCollectionViewController = storyBoard.instantiateViewController(withIdentifier: "MyCollectionViewController") as?
             MyCollectionViewController else { fatalError("Unable to idenfity MyCollectionViewController") }
         self.navigationController?.pushViewController(myCollectionViewController, animated: true)
     }
     
+    // MARK: - Load Data Section In _photoSections
     func loadSection(data: Any?, provider: Provider) {
         guard let dictionary = data as? [String: Any] else { return }
         var newList: [PhotoProtocol] = []
@@ -112,6 +120,7 @@ class ImageListViewController: UIViewController {
             print("not a provider!!!")
         }
     }
+    // MARK: - Setup Providers Parameterrs
     func setProviderParameter(_ provider: Provider, _ text: String) -> Provider {
         var currentProvider = provider
         if currentProvider.parameter?["q"] != nil {
@@ -122,6 +131,7 @@ class ImageListViewController: UIViewController {
         }
         return currentProvider
     }
+    
     // MARK: - GetDataFromServer Method
     func fetchData(text: String) {
         for provider in providersList where provider.isOn {
@@ -142,40 +152,13 @@ class ImageListViewController: UIViewController {
             self.didFinishedLoading()
         }
     }
-    func didFinishedLoading() {
-        self.showNoResults()
-        self.tableView.reloadData()
-        
-    }
-   func showNoResults() {
-          self.tableView.backgroundView = (numberOfSetions() > 0) ? nil : self.label
-      }
-      
-      func numberOfSetions() -> Int {
-          guard let section = self.photoSections else { return 0 }
-          return section.count
-      }
-    
-    func enableProviders() {
-        for (index, provider) in self.providersInfo.enumerated() where provider.isOn == true {
-            self.providersList[index].isOn = true
-        }
-    }
-    
-    func disableProviders() {
-        for index in 0 ..< self.providersList.count {
-            self.providersList[index].isOn = false
-        }
-    }
-    func resetDataSouce() {
-           _photoSections = []
-        self.tableView.reloadData()
-       }
+    // MARK: - Handle TextChange
     func handleTextChange(_ text: String) {
         searchWebWorkItem?.cancel()
         if !(photoSections?.isEmpty ?? true) {
             resetDataSouce()
         }
+        // MARK: - Implementation DispatchWorkItem
         searchWebWorkItem = DispatchWorkItem {
             self.enableProviders()
             self.fetchData(text: text)
@@ -185,7 +168,7 @@ class ImageListViewController: UIViewController {
         DispatchQueue.global().asyncAfter(deadline: .now() + 3, execute: searchItem)
     }
 }
-
+// MARK: - UITableViewDataSource, UITableViewDelegate
 extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -199,6 +182,7 @@ extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
         return photoSections?[section].photos?.count ?? 0
     }
     
+    // MARK: - didSelectRowAt Implementation
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.tableView.deselectRow(at: indexPath, animated: true)
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -212,6 +196,7 @@ extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
         self.navigationController?.present(navController, animated: true, completion: nil)
     }
     
+    // MARK: - cellForRowAt Implementation
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ImageTableViewCell", for: indexPath)
             as? ImageTableViewCell else { fatalError("Unable to deque Tableview with ImageTableViewCell") }
@@ -223,12 +208,15 @@ extension ImageListViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+// MARK: - UISearchBarDelegate
 extension ImageListViewController: UISearchBarDelegate {
+    
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
         resetDataSouce()
         self.view.endEditing(true)
     }
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         self.view.endEditing(true)
     }
@@ -237,7 +225,6 @@ extension ImageListViewController: UISearchBarDelegate {
         guard !searchText.isEmpty else { resetDataSouce(); return }
         print("count: ", searchText.count )
         if searchText.count >= 5 {
-            print("count >= 5", searchText.count)
             let text = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
             if let stringForURL = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
                 handleTextChange(stringForURL)
@@ -246,6 +233,8 @@ extension ImageListViewController: UISearchBarDelegate {
     }
     
 }
+
+// MARK: - Perform Add/Remove/ Helper Methods Operation to _photosections
 extension ImageListViewController {
     
     func removeProvider(provider: ProviderInfo) {
@@ -256,24 +245,54 @@ extension ImageListViewController {
         guard  let text = searchBar.text, text.count >= 5 else { return }
         fetchData(text: text)
     }
+    
+    func didFinishedLoading() {
+        self.showNoResults()
+        self.tableView.reloadData()
+        print("Reload")
+    }
+    
+    func showNoResults() {
+        self.tableView.backgroundView = (numberOfSetions() > 0) ? nil : self.label
+    }
+    
+    func numberOfSetions() -> Int {
+        guard let section = self.photoSections else { return 0 }
+        return section.count
+    }
+    
+    func enableProviders() {
+        for (index, provider) in self.providersInfo.enumerated() where provider.isOn == true {
+            self.providersList[index].isOn = true
+        }
+    }
+    
+    func disableProviders() {
+        for index in 0 ..< self.providersList.count {
+            self.providersList[index].isOn = false
+        }
+    }
+    
+    func resetDataSouce() {
+        _photoSections = []
+        self.tableView.reloadData()
+    }
 }
 
 extension ImageListViewController: SettingViewControllerDelegate {
     
+    // MARK: - Apply Filter To  All Images and Reload
     func applyFilterToImages(filter: FilterType) {
-        
         if filter == .none {
             tableView.reloadData()
             applyFilter = nil
-            
         } else {
             applyFilter = filter
             tableView.reloadData()
         }
     }
-    
-    func updateProvidersList(provider: ProviderInfo) {
-        
+    // MARK: - SetupAddReveProvider
+    func setupAddReveProvider(provider: ProviderInfo) {
         let indexProvider = updateProviders(provider: provider)
         if provider.isOn {
             if let index = indexProvider {
@@ -285,7 +304,7 @@ extension ImageListViewController: SettingViewControllerDelegate {
             removeProvider(provider: provider)
         }
     }
-    
+    // MARK: - Update Providers availability
     func updateProviders(provider: ProviderInfo) -> Int? {
         for (index, currentProvider) in providersInfo.enumerated() where currentProvider.name == provider.name {
             self.providersInfo[index].isOn = provider.isOn

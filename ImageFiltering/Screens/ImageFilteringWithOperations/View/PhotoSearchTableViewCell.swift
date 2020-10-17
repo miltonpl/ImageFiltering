@@ -11,7 +11,7 @@ import UIKit
 class PhotoSearchTableViewCell: UITableViewCell {
     
     static let identifier = "PhotoSearchTableViewCell"
-    let indicator = UIActivityIndicatorView(style: .large)
+    let indicator = UIActivityIndicatorView()
     
     @IBOutlet weak var itemImageView: UIImageView! {
         didSet {

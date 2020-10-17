@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.3" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="2sU-Lw-oC0">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -11,7 +12,7 @@
         <!--Image List View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ImageListViewController" customModule="ImageFiltering" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ImageListViewController" id="BYZ-38-t0r" customClass="ImageListViewController" customModule="ImageFiltering" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -62,7 +63,8 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="ftR-Y9-4CZ">
                                 <rect key="frame" x="0.0" y="44" width="414" height="818"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="rnM-xz-74D">
+                                <viewLayoutGuide key="safeArea" id="XfZ-5C-Smz"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="rnM-xz-74D">
                                     <size key="itemSize" width="128" height="128"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
@@ -110,7 +112,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="zsb-dm-8ia">
-                                <rect key="frame" x="0.0" y="44" width="414" height="768"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="786"/>
                                 <color key="backgroundColor" systemColor="systemGray6Color" red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="sectionIndexBackgroundColor" systemColor="systemGray3Color" red="0.78039215689999997" green="0.78039215689999997" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="sectionIndexTrackingBackgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
@@ -119,9 +121,24 @@
                                     <outlet property="delegate" destination="rv3-N6-8D6" id="Lwm-8b-67v"/>
                                 </connections>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E6Q-yn-Qys">
-                                <rect key="frame" x="10" y="822" width="394" height="30"/>
-                                <color key="backgroundColor" systemColor="systemGray6Color" red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VpS-bZ-XuM">
+                                <rect key="frame" x="10" y="830" width="404" height="1"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color" red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="g1f-5m-hbx"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Noh-R6-idm">
+                                <rect key="frame" x="10" y="861" width="404" height="1"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color" red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="Lrk-eq-dSj"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="404" placeholderIntrinsicHeight="30" contentHorizontalAlignment="fill" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E6Q-yn-Qys">
+                                <rect key="frame" x="10" y="831" width="404" height="30"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <state key="normal" title="Button">
                                     <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
@@ -132,13 +149,20 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="SVt-H3-ZRR" firstAttribute="bottom" secondItem="E6Q-yn-Qys" secondAttribute="bottom" constant="10" id="GoK-k1-hsQ"/>
-                            <constraint firstItem="zsb-dm-8ia" firstAttribute="top" secondItem="SVt-H3-ZRR" secondAttribute="top" id="QBz-1r-v9a"/>
+                            <constraint firstItem="zsb-dm-8ia" firstAttribute="top" secondItem="SVt-H3-ZRR" secondAttribute="top" id="2A1-bt-O7i"/>
+                            <constraint firstItem="SVt-H3-ZRR" firstAttribute="trailing" secondItem="VpS-bZ-XuM" secondAttribute="trailing" id="2sm-lK-Lrh"/>
+                            <constraint firstItem="zsb-dm-8ia" firstAttribute="leading" secondItem="SVt-H3-ZRR" secondAttribute="leading" id="Aad-HZ-tma"/>
+                            <constraint firstItem="zsb-dm-8ia" firstAttribute="trailing" secondItem="SVt-H3-ZRR" secondAttribute="trailing" id="AyK-tm-4mf"/>
+                            <constraint firstItem="SVt-H3-ZRR" firstAttribute="bottom" secondItem="Noh-R6-idm" secondAttribute="bottom" id="Fy9-9l-tXg"/>
+                            <constraint firstItem="E6Q-yn-Qys" firstAttribute="top" secondItem="VpS-bZ-XuM" secondAttribute="bottom" id="MM8-ns-1di"/>
                             <constraint firstItem="E6Q-yn-Qys" firstAttribute="leading" secondItem="SVt-H3-ZRR" secondAttribute="leading" constant="10" id="Ryb-Os-o00"/>
-                            <constraint firstItem="zsb-dm-8ia" firstAttribute="leading" secondItem="SVt-H3-ZRR" secondAttribute="leading" id="XNn-Ei-zT5"/>
-                            <constraint firstItem="SVt-H3-ZRR" firstAttribute="trailing" secondItem="E6Q-yn-Qys" secondAttribute="trailing" constant="10" id="gdf-Lf-BaA"/>
-                            <constraint firstItem="zsb-dm-8ia" firstAttribute="trailing" secondItem="SVt-H3-ZRR" secondAttribute="trailing" id="n8V-pW-Ped"/>
-                            <constraint firstItem="E6Q-yn-Qys" firstAttribute="top" secondItem="zsb-dm-8ia" secondAttribute="bottom" constant="10" id="xEE-ze-bIf"/>
+                            <constraint firstItem="VpS-bZ-XuM" firstAttribute="leading" secondItem="SVt-H3-ZRR" secondAttribute="leading" constant="10" id="Y8Z-kq-WBv"/>
+                            <constraint firstItem="SVt-H3-ZRR" firstAttribute="trailing" secondItem="E6Q-yn-Qys" secondAttribute="trailing" id="gdf-Lf-BaA"/>
+                            <constraint firstItem="Noh-R6-idm" firstAttribute="leading" secondItem="SVt-H3-ZRR" secondAttribute="leading" constant="10" id="orQ-oI-UpZ"/>
+                            <constraint firstItem="Noh-R6-idm" firstAttribute="top" secondItem="E6Q-yn-Qys" secondAttribute="bottom" id="pTU-7E-H2c"/>
+                            <constraint firstItem="VpS-bZ-XuM" firstAttribute="top" secondItem="zsb-dm-8ia" secondAttribute="bottom" id="r39-65-ckH"/>
+                            <constraint firstItem="Noh-R6-idm" firstAttribute="top" secondItem="E6Q-yn-Qys" secondAttribute="bottom" id="roJ-Ny-hmT"/>
+                            <constraint firstItem="Noh-R6-idm" firstAttribute="trailing" secondItem="SVt-H3-ZRR" secondAttribute="trailing" id="zmz-EZ-Te8"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="SVt-H3-ZRR"/>
                     </view>
@@ -249,8 +273,8 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="170" id="P8n-Nd-XNh"/>
                                 </constraints>
-                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="5" id="AMx-bT-ey9">
-                                    <size key="itemSize" width="150" height="150"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" sectionInsetReference="safeArea" id="AMx-bT-ey9">
+                                    <size key="itemSize" width="150" height="170"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>

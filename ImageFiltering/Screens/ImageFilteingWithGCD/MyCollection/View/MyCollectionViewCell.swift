@@ -21,7 +21,7 @@ class MyCollectionViewCell: UICollectionViewCell {
     }
     @IBOutlet weak var titleLabel: UILabel!
     
-    let indicator = UIActivityIndicatorView(style: .medium)
+    let indicator = UIActivityIndicatorView()
     
     static func nib() -> UINib {
         return UINib(nibName: "MyCollectionViewCell", bundle: nil)
@@ -36,15 +36,12 @@ class MyCollectionViewCell: UICollectionViewCell {
         self.titleLabel.text = photoModel.providerName
         
         if let strUrl = photoModel.url, let url = URL(string: strUrl ) {
-            print(photoModel.filterType)
             if photoModel.filterType == .none {
                 itemImageView.downloadImage(with: url)
-                print(url)
                 indicator.stopAnimating()
                 indicator.removeFromSuperview()
             } else {
                 itemImageView.downloadAndApplyFilterToImage(url, photoModel.filterType)
-                print(url)
                 indicator.stopAnimating()
                 indicator.removeFromSuperview()
             }

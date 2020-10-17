@@ -1,5 +1,5 @@
 //
-//  UIImageViewExtension.swift
+//  UIImageView+Ext.swift
 //  ImageFiltering
 //
 //  Created by Milton Palaguachi on 10/13/20.

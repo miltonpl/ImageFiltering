@@ -104,11 +104,11 @@ class ImageDownloader: Operation {
 }
 
 class ImageFiltration: Operation {
+    
     private var _isExecuting = false
     private var _isFinished = false
     
-    var photoRecord: PhotoProtocol
-    var helper = Helper()
+    public var photoRecord: PhotoProtocol
     
     init(_ photoRecord: PhotoProtocol) {
         self.photoRecord = photoRecord
@@ -186,7 +186,7 @@ class ImageFiltration: Operation {
         }
         //Get output CIImage, render as CGImage First to retail proper UIImage scale
         //        let context = CIContext(options: nil)
-        let context = helper.context
+        let context = Constants.ciContext
         guard let outputImage = filter.outputImage, let outImage = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
         return UIImage(cgImage: outImage)
     }

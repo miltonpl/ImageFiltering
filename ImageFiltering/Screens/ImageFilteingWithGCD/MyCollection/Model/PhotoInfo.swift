@@ -13,3 +13,8 @@ struct PhotoModel {
     var filterType: FilterType = .none
     var providerName: String = "NONE"
 }
+struct PhotoModelTemp: Decodable {
+    var url: String?
+    var filterType: String
+    var providerName: String
+}

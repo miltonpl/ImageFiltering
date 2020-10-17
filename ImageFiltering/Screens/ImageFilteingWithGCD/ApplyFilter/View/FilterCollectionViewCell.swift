@@ -21,7 +21,7 @@ class FilterCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     
-    let indicator = UIActivityIndicatorView(style: .medium)
+    let indicator = UIActivityIndicatorView()
 
     static func nib() -> UINib {
         return UINib(nibName: "FilterCollectionViewCell", bundle: nil)

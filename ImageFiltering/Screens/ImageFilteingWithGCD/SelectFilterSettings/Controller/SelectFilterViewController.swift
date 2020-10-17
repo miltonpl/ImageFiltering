@@ -7,31 +7,32 @@
 //
 import UIKit
 import CoreImage
-
+// MARK: - Delegate
 protocol SelectFilterViewControllerDelegate: AnyObject {
     func applyFilterToImagesInImageListViewController(filter: FilterType)
 }
 
 class SelectFilterViewController: UIViewController {
-    
-    @IBOutlet weak var tableView: UITableView! {
+    // MARK: - @IBOutlet
+    @IBOutlet weak private var tableView: UITableView! {
         didSet {
             self.tableView.tableFooterView = UIView()
         }
     }
-       
-    weak var delegate: SelectFilterViewControllerDelegate?
-    var filterTypes: [FilterType] = []
-    var indexPath: IndexPath?
+    // MARK: - Store Properties
+    weak public var delegate: SelectFilterViewControllerDelegate?
+    private var filterTypes: [FilterType] = []
+    private var indexPath: IndexPath?
     
+    // MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Set Filter"
-        self.setupTabBarItems()
+        self.setupTabBarItem()
         self.filterTypes = Constants.filterTypes
     }
-    
-    func setupTabBarItems() {
+    // MARK: - Setup TabBarItem
+    func setupTabBarItem() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelBarItem(_:)))
     }
     
@@ -45,6 +46,7 @@ class SelectFilterViewController: UIViewController {
     }
 }
 
+// MARK: - UITableView Delegate, UITableView DataSource
 extension SelectFilterViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
@@ -65,7 +67,7 @@ extension SelectFilterViewController: UITableViewDelegate, UITableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         filterTypes.count
     }
-    
+    // MARK: - CellForRowAt
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "SelectFilterTableViewCell", for: indexPath) as?   SelectFilterTableViewCell else {
             fatalError("Unable to dequeue (FilterTableViewCell) tableView In FilterViewController ")
